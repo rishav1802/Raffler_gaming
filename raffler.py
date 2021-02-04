@@ -20,16 +20,16 @@ def after_request(response):
 def build_db():
     # print("building database")
     """Builds the database if necessary"""
-    dbi = sqlite3.connect('raffle.db')
-    db = dbi.cursor()
+    db = sqlite3.connect('raffle.db')
+    # db = dbi.cursor()
     # try:
     #     db.execute('SELECT 1 FROM Events')
     #     # print(db.fetchone())
     # except sqlite3.OperationalError:
     #     with db:
-    db.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY, Event_Date TEXT, Rewards TEXT )')
+    # db.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY, Event_Date TEXT, Rewards TEXT )')
 
-    db.execute('CREATE TABLE Users (id INTEGER PRIMARY KEY, Name TEXT, Ticket TEXT )')
+    # db.execute('CREATE TABLE Users (id INTEGER PRIMARY KEY, Name TEXT, Ticket TEXT )')
     # db.execute("""CREATE TABLE Register_event (
 
     # )""" )
@@ -43,8 +43,8 @@ def build_db():
         # users = set()
         for line in data.readlines():
             event, reward = (line.strip().split(","))
-            print("event") 
-            # db.execute("INSERT INTO Events VALUES("+")
+            print(event + reward) 
+            db.execute("INSERT INTO Events(Event_Date, Rewards) VALUES", (event, reward))
 
         # for user in users:
         #     db.execute("""INSERT INTO Events(name)
