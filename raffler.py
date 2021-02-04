@@ -45,7 +45,7 @@ def build_db():
             event, reward = (line.strip().split(","))
             print(event + reward) 
             db.execute("INSERT INTO Events(Event_Date, Rewards) VALUES", (event, reward))
-
+            
         # for user in users:
         #     db.execute("""INSERT INTO Events(name)
         #         VALUES (?)""", (user,))
