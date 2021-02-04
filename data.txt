@@ -1,0 +1,23 @@
+8AM 8/02/2021, Washing Machine
+8AM 9/02/2021, Radio
+10, Table
+11, Chair
+12, Bedsheet
+13, Playstation
+14, Router
+15, Speaker
+16, Travel ticket
+17, cake
+18, Scooty
+19, Burger
+20, Grofers coupon
+21, Pizza
+22, Fridge
+23, Telephone
+24, Jeans
+25, Shoes
+26, Shorts
+27, Iphone
+28, Ipad
+29, Mobile
+30, Car
