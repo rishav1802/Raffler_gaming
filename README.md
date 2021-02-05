@@ -1,14 +1,15 @@
 # Raffler_gaming
-CREATE TABLE Events(
-id INTEGER PRIMARY KEY,
-Event_date TEXT,
-Rewards TEXT)
+Schema:
+1. User(uid, name)  : UID is primary key
 
-![](IMG20210204134244.jpg)
-![](IMG20210204182350.jpg)
+2. Events(eid, edate, Reward) : Eid is primary key
+
+3. Participate(uid, eid) : (uid,eid) : primary key ; uid is foreign key with reference to User uid
+eid is foreign key of event eid;
+
+4. winner(Eid, Name, Award) : primary key is eid  ; name is foreign key with reference to User table name and award is foreign key with events table;
 
 
 
-* Create a txt file with the information about event date and award for that event.
-* Read from the txt file into an EVENTS Table.
-build event database by
+
+

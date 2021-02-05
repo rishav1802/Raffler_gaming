@@ -1,23 +1,23 @@
 8AM 8/02/2021, Washing 
 8AM 9/02/2021, Radio
-10, Table
-11, Chair
-12, Bedsheet
-13, Playstation
-14, Router
-15, Speaker
-16, Travel ticket
-17, cake
-18, Scooty
-19, Burger
-20, Grofers coupon
-21, Pizza
-22, Fridge
-23, Telephone
-24, Jeans
-25, Shoes
-26, Shorts
-27, Iphone
-28, Ipad
-29, Mobile
-30, Car
+8AM 10/02/2021, Table
+8AM 11/02/2021, Chair
+8AM 12/02/2021, Bedsheet
+8AM 13/02/2021, Playstation
+8AM 14/02/2021, Router
+8AM 15/02/2021, Speaker
+8AM 16/02/2021, Travel ticket
+8AM 17/02/2021, cake
+8AM 18/02/2021, Scooty
+8AM 19/02/2021, Burger
+8AM 20/02/2021, Grofers coupon
+8AM 21/02/2021, Pizza
+8AM 22/02/2021, Fridge
+8AM 23/02/2021, Telephone
+8AM 24/02/2021, Jeans
+8AM 25/02/2021, Shoes
+8AM 26/02/2021, Shorts
+8AM 27/02/2021, Iphone
+8AM 28/02/2021, Ipad
+8AM 29/02/2021, Mobile
+8AM 30/02/2021, Car
