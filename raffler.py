@@ -9,10 +9,12 @@ DATABASE = 'raffle.db'
 def before_request():
     """Connects to the database on each request"""
     g.db = sqlite3.connect(DATABASE)
+    g.cursor = g.db.cursor()
 
 @app.after_request
 def after_request(response):
     """Close the db connection"""
+    g.cursor.close()
     g.db.close()
     return response
 
@@ -36,8 +38,8 @@ def add_user():
         s=""
         s+=username;
         username = [username];
-        with g.db:
-            g.db.execute("INSERT INTO Users( Name) VALUES(?)", username);
+        g.db.execute("INSERT INTO Users( Name) VALUES(?)", username);
+        g.db.commit() 
         s+=" added successfully";
         return s;
         # print(username + "added successfully");
@@ -56,8 +58,21 @@ def register_event():
         # else:
         pdata = [uid, eid]
         g.db.execute("INSERT INTO Participate(User_Id, Event_Id) VALUES(?, ?)", pdata)
+        g.db.commit()
         s="Registered User with ID" +uid +" Successfully for Event ID" +eid  
         return s;
+
+@app.route('/winner', methods = ["POST"])
+def event_winner():
+    """PIcks random participant as winner for an event"""
+    if request.method == 'POST':
+        eid = request.form['eventid']
+        print(eid)
+        users = g.db.execute("SELECT User_Id from PARTICIPATE WHERE Event_Id = eid").fetchall()
+        user = random.SystemRandom().choice(users)
+        print(user + "winner" + eid)
+        g.db.commit()
+
 
 
 def build_db():
@@ -75,7 +90,8 @@ def build_db():
     # cursor.execute('CREATE TABLE Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id))')
     # print("Participate table created")
 
-    cursor.execute('CREATE TABLE ')
+    # cursor.execute('CREATE TABLE Winner (Event_Id INTEGER, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Id), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) )')
+    # cursor.execute('CREATE TABLE ')
 
     # db.execute("""CREATE TABLE Register_event (
 

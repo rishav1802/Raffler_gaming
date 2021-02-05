@@ -1,13 +1,15 @@
 # Raffler_gaming
 Schema:
-1. User(uid, name)  : UID is primary key
 
-2. Events(eid, edate, Reward) : Eid is primary key
+CREATE TABLE raffle.Events (id INTEGER PRIMARY KEY AUTOINCREMENT, Event_Date TEXT, Rewards TEXT );
 
-3. Participate(uid, eid) : (uid,eid) : primary key ; uid is foreign key with reference to User uid
-eid is foreign key of event eid;
 
-4. winner(Eid, Name, Award) : primary key is eid  ; name is foreign key with reference to User table name and award is foreign key with events table;
+CREATE TABLE raffle.Users (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT);
+
+CREATE TABLE raffle.Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id));
+
+
+CREATE TABLE raffle.Winner (Event_Id INTEGER, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Id), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) );
 
 
 
