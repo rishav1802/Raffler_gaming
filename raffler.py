@@ -68,9 +68,9 @@ def event_winner():
     if request.method == 'POST':
         eid = request.form['eventid']
         print(eid)
-        users = g.db.execute("SELECT User_Id from PARTICIPATE WHERE Event_Id = eid").fetchall()
-        user = random.SystemRandom().choice(users)
-        print(user + "winner" + eid)
+        usersid = g.db.execute("SELECT User_Id from PARTICIPATE WHERE Event_Id = eid").fetchall()
+        userid = random.SystemRandom().choice(users)
+        print(userid + "winner" + eid)
         g.db.commit()
 
 
