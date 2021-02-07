@@ -1,5 +1,5 @@
 import sqlite3
-
+import random
 from flask import Flask, g, request
 app = Flask(__name__)
 
@@ -40,7 +40,10 @@ def add_user():
         username = [username];
         g.db.execute("INSERT INTO Users( Name) VALUES(?)", username);
         g.db.commit() 
-        s+=" added successfully";
+
+        users = g.db.execute("SELECT * FROM Users").fetchall()
+        print(users)
+        s+=" added successfully and token no. is:" 
         return s;
         # print(username + "added successfully");
 
@@ -59,6 +62,10 @@ def register_event():
         pdata = [uid, eid]
         g.db.execute("INSERT INTO Participate(User_Id, Event_Id) VALUES(?, ?)", pdata)
         g.db.commit()
+
+        regusers = g.db.execute("SELECT * FROM Participate").fetchall()
+        print(regusers)
+
         s="Registered User with ID" +uid +" Successfully for Event ID" +eid  
         return s;
 
@@ -68,10 +75,24 @@ def event_winner():
     if request.method == 'POST':
         eid = request.form['eventid']
         print(eid)
-        usersid = g.db.execute("SELECT User_Id from PARTICIPATE WHERE Event_Id = eid").fetchall()
-        userid = random.SystemRandom().choice(users)
-        print(userid + "winner" + eid)
+        eid = int(eid)
+        eventids = g.db.execute("SELECT id from EVENTS ").fetchall;
+        print(eventids)
+        for eid in eventids:
+            usersid = g.db.execute("SELECT User_Id from Participate WHERE Event_Id = eid").fetchall()
+            userid = random.SystemRandom().choice(usersid)
+            for uid in userid :
+                wid = uid
+            reward = g.db.execute("SELECT REWARDS FROM EVENTS WHERE Event_Id = eid")
+            wname = g.db.execute("SELECT Name FROM Users WHERE id = wid")
+            data = [eid, wname, reward]
+            g.db.execute("INSERT INTO WINNER(Event_Id, Name, Rewards) VALUES(?, ?, ?)", data)
+
+        print(id)
+        s = str(id) + "is the winner for event" + eid 
+        print(s)
         g.db.commit()
+        return s
 
 
 
@@ -81,38 +102,35 @@ def build_db():
     conn = sqlite3.connect('raffle.db')
     cursor = conn.cursor()
     
-    # cursor.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY AUTOINCREMENT, Event_Date TEXT PRIMARY KEY, Rewards TEXT )')
+    # cursor.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY AUTOINCREMENT, Event_Date TEXT, Rewards TEXT )')
     # print(" Events Table Created")
 
     # cursor.execute('CREATE TABLE Users (id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)')
     # print("User Table Created")
     
-    # cursor.execute('CREATE TABLE Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id))')
-    # print("Participate table created")
+    cursor.execute('CREATE TABLE Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id))')
+    print("Participate table created")
 
     # cursor.execute('CREATE TABLE Winner (Event_Id INTEGER, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Id), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) )')
-    # cursor.execute('CREATE TABLE ')
+    # print("Winner table created")
 
-    # db.execute("""CREATE TABLE Register_event (
 
-    # )""" )
-
-    with open('data.txt', 'r') as data:
-        for line in data.readlines():
-            event, reward = (line.strip().split(","))
-            # print ( event + reward)   
-            data = [event, reward]
-            try:
-                cursor.execute("INSERT INTO Events( Event_Date, Rewards) VALUES(?, ?)", data)
-                conn.commit()
-            except Error as err:
-                print(err)
+    # with open('data.txt', 'r') as data:
+    #     for line in data.readlines():
+    #         event, reward = (line.strip().split(","))
+    #         # print ( event + reward)   
+    #         data = [event, reward]
+    #         try:
+    #             cursor.execute("INSERT INTO Events( Event_Date, Rewards) VALUES(?, ?)", data)
+    #             conn.commit()
+    #         except Error as err:
+    #             print(err)
 
     cursor.close()
     conn.close()
 
 if __name__ == '__main__':
-    build_db()
+    # build_db()
     app.run()
 
 
