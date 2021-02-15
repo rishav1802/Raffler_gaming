@@ -34,6 +34,7 @@ def show_events():
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
+    '''Adds a User and assigns him a token number'''
     if request.method == 'POST':
         username = request.form['username']
         print("username is:" + username);
@@ -55,6 +56,7 @@ def add_user():
 
 @app.route('/participate', methods=["POST"])
 def register_event():
+    '''Registers a user using his token number for a particular event'''
     if request.method == 'POST':
         uid = request.form['userid']
         eid = request.form['eventid']
@@ -119,6 +121,7 @@ def event_winner():
 
 @app.route('/show_winners', methods = ["GET"])
 def show_winners():
+    '''Shows the winners table'''
     c = g.db.execute('SELECT * FROM WINNER')
     return render_template('winner.html', rows = c.fetchall())
 
@@ -130,34 +133,38 @@ def build_db():
     conn = sqlite3.connect('raffle.db')
     cursor = conn.cursor()
     
-    # cursor.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY AUTOINCREMENT, Event_Date TEXT, Rewards TEXT )')
-    # print(" Events Table Created")
+    cursor.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY AUTOINCREMENT, Event_Date TEXT, Rewards TEXT )')
+    print(" Events Table Created")
 
-    # cursor.execute('CREATE TABLE Users (token INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)')
-    # print("User Table Created")
+    cursor.execute('CREATE TABLE Users (token INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)')
+    print("User Table Created")
     
-    # cursor.execute('CREATE TABLE Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id))')
-    # print("Participate table created")
+    cursor.execute('CREATE TABLE Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id))')
+    print("Participate table created")
 
     cursor.execute('CREATE TABLE Winner (Event_Date TEXT, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Date), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) )')
     print("Winner table created")
 
 
-    # with open('data.txt', 'r') as data:
-    #     for line in data.readlines():
-    #         event, reward = (line.strip().split(","))
-    #         # print ( event + reward)   
-    #         data = [event, reward]
-    #         try:
-    #             cursor.execute("INSERT INTO Events( Event_Date, Rewards) VALUES(?, ?)", data)
-    #             conn.commit()
-    #         except Error as err:
-    #             print(err)
+
+    '''Read Information about the Lucky Draw Events from txt file in same folder'''
+    
+    with open('data.txt', 'r') as data:
+        for line in data.readlines():
+            event, reward = (line.strip().split(","))
+            # print ( event + reward)   
+            data = [event, reward]
+            try:
+                cursor.execute("INSERT INTO Events( Event_Date, Rewards) VALUES(?, ?)", data)
+                conn.commit()
+            except Error as err:
+                print(err)
 
     cursor.close()
     conn.close()
 
 if __name__ == '__main__':
+    '''run build_db once initially for creating tables'''
     build_db()
     app.run()
 
