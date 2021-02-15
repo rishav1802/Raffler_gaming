@@ -7,9 +7,21 @@ CREATE TABLE r.Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_
 CREATE TABLE r.Winner (Event_Date TEXT, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Date), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) );
 
 STEPS:
-
+	open terminal 
+	
 1. virtualenv env
 2. source env/bin/activate
 3. pip3 install -r requirements.txt
 4. export FLASK_APP = raffler.py
 5. flask run
+
+To view contents of a table:
+	open terminal
+	
+1. install sqlite3
+2. sqlite3
+3. ATTACH 'raffle.db' as r;
+4. .tables
+5. SELECT * FROM 'TABLE_NAME';
+6. .schema
+
