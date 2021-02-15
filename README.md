@@ -12,6 +12,9 @@ CREATE TABLE raffle.Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(
 CREATE TABLE raffle.Winner (Event_Id INTEGER, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Id), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) );
 
 
+STEPS:
+
+Initially to build the database uncomment the build_db function call in the main function
 
 
 
