@@ -66,6 +66,8 @@ def register_event():
         	return "User not assigned a token yet"
         evexist = g.cursor.execute("SELECT EVENT_DATE FROM Events where id = ?", (eid,)).fetchall()
         print(evexist)
+        if not evexist:
+        	return "Invalid Event id"
         for eve in evexist[0]:
         	ev = eve
         ev = str(ev)
@@ -73,8 +75,7 @@ def register_event():
         	eventover = g.cursor.execute("SELECT * FROM WINNER WHERE winner.event_date = ?", (ev,)).fetchall()
         	if eventover:
         		return "Event already Over"
-        if not evexist:
-        	return "Invalid Event id"	
+        	
         	
         
         
