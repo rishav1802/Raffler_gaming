@@ -38,19 +38,18 @@ def add_user():
     if request.method == 'POST':
         username = request.form['username']
         print("username is:" + username);
-        s=""
-        s+=username;
-        username = [username];
-        exists = g.cursor.execute("SELECT * FROM Users where Name = ?", username).fetchall()
+       
+        exists = g.cursor.execute("SELECT * FROM Users where Name = ?", (username,)).fetchall()
         if exists:
             return "User Already Registered"
         else:
-            g.cursor.execute("INSERT INTO Users( Name) VALUES(?)", username);
+            g.cursor.execute("INSERT INTO Users( Name) VALUES(?)", (username,));
             g.db.commit() 
 
             users = g.cursor.execute("SELECT * FROM Users").fetchall()
             print(users)
-            s+=" added successfully and token no. is:" 
+            #s=""
+            #s+=" added successfully and token no. is:" 
             return render_template('users.html', rows = users);
         # print(username + "added successfully");
 
@@ -61,6 +60,24 @@ def register_event():
         uid = request.form['userid']
         eid = request.form['eventid']
         # If (uid, eid) already present in Table return error
+        
+        exists = g.cursor.execute("SELECT * FROM Users where token = ?", (uid,)).fetchall()
+        if not exists:
+        	return "User not assigned a token yet"
+        evexist = g.cursor.execute("SELECT EVENT_DATE FROM Events where id = ?", (eid,)).fetchall()
+        print(evexist)
+        for eve in evexist[0]:
+        	ev = eve
+        ev = str(ev)
+        if evexist:
+        	eventover = g.cursor.execute("SELECT * FROM WINNER WHERE winner.event_date = ?", (ev,)).fetchall()
+        	if eventover:
+        		return "Event already Over"
+        if not evexist:
+        	return "Invalid Event id"	
+        	
+        
+        
 
         # if(g.db.execute("SELECT User_Id, Event_Id FROM Participate WHERE (User_Id = uid and Event_Id = eid")):
         #     str="User cannot participate again in the same event"
@@ -83,7 +100,7 @@ def event_winner():
     if request.method == 'POST':
         eid = request.form['eventid']
         # print(eid)
-        # eventids = g.cursor.execute("SELECT id from EVENTS where id = ? ", eid).fetchall();
+        # eventids = g.cursor.execute("SELECT id from EVENTS where id = ? ", (eid,)).fetchall();
         # print(eventids)
         # for eid in eventids:
         usersid = g.cursor.execute("SELECT User_Id from Participate WHERE Event_Id = ? ", (eid,)).fetchall()
@@ -165,7 +182,7 @@ def build_db():
 
 if __name__ == '__main__':
     '''run build_db once initially for creating tables'''
-    build_db()
+    #build_db()
     app.run()
 
 
