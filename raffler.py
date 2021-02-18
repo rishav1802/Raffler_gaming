@@ -24,7 +24,7 @@ def after_request(response):
 def show_next_event():
     """Shows the next lucky draw event timing & corresponding reward"""
     if request.method == 'GET':
-        winners = g.cursor.execute("SELECT * FROM Events where id =?", eid)
+        winners = g.cursor.execute("SELECT * FROM Events where eventid =?", eid)
         # g.db.commit()
         
         rows = winners.fetchall();
@@ -188,20 +188,20 @@ def build_db():
     conn = sqlite3.connect('raffle.db')
     cursor = conn.cursor()
     
-    cursor.execute('CREATE TABLE Events (eventid INTEGER PRIMARY KEY AUTOINCREMENT, eventdate TEXT, rewards TEXT )')
-    print(" Events Table Created")
+    # cursor.execute('CREATE TABLE Events (eventid INTEGER PRIMARY KEY AUTOINCREMENT, eventdate TEXT, rewards TEXT )')
+    # print(" Events Table Created")
 
-    cursor.execute('CREATE TABLE Users (ticketid INTEGER PRIMARY KEY, name TEXT)')
-    print("User Table Created")
+    # cursor.execute('CREATE TABLE Users (ticketid INTEGER PRIMARY KEY, name TEXT)')
+    # print("User Table Created")
 
-    cursor.execute('CREATE TABLE TICKETS (ticketid INTEGER PRIMARY KEY, used boolean, FOREIGN KEY(ticketid) REFERENCES USERS (ticketid))')
-    print("TICKET Table Created")
+    # cursor.execute('CREATE TABLE TICKETS (ticketid INTEGER PRIMARY KEY, used boolean, FOREIGN KEY(ticketid) REFERENCES USERS (ticketid))')
+    # print("TICKET Table Created")
     
-    cursor.execute('CREATE TABLE Participate (userid INTEGER, eventid INTEGER, PRIMARY KEY(userid, eventid))')
-    print("Participate table created")
+    # cursor.execute('CREATE TABLE Participate (userid INTEGER, eventid INTEGER, PRIMARY KEY(userid, eventid))')
+    # print("Participate table created")
 
-    cursor.execute('CREATE TABLE Winner (eventdate TEXT, name TEXT, rewards TEXT, PRIMARY KEY(eventdate), FOREIGN KEY(name) REFERENCES Users (name), FOREIGN KEY(rewards) REFERENCES Events (rewards) )')
-    # print("Winner table created")
+    # cursor.execute('CREATE TABLE Winner (eventdate TEXT, name TEXT, rewards TEXT, PRIMARY KEY(eventdate), FOREIGN KEY(name) REFERENCES Users (name), FOREIGN KEY(rewards) REFERENCES Events (rewards) )')
+    # # print("Winner table created")
 
 
 
@@ -230,7 +230,7 @@ if __name__ == '__main__':
     '''run build_db once initially for creating tables'''
     global eid
     eid = "1"
-    # build_db()
+    build_db()
     app.run()
 
 
