@@ -34,26 +34,42 @@ def show_next_event():
 
 
 
+
+
 @app.route('/add_user', methods=['POST'])
 def add_user():
     '''Adds a User and assigns him a token number'''
     if request.method == 'POST':
+
         username = request.form['username']
         print("username is:" + username);
-       
-        exists = g.cursor.execute("SELECT * FROM Users where Name = ?", (username,)).fetchall()
-        if exists:
-            return "User Already Registered"
-        else:
-            g.cursor.execute("INSERT INTO Users( Name) VALUES(?)", (username,));
-            g.db.commit() 
 
-            users = g.cursor.execute("SELECT * FROM Users").fetchall()
-            print(users)
-            #s=""
-            #s+=" added successfully and token no. is:" 
-            return render_template('users.html', rows = users);
+        ticketid = request.form['ticketid']
+       
+        # exists = g.cursor.execute("SELECT * FROM Users where Name = ?", (username,)).fetchall()
+        # if exists:
+        #     return "User Already Registered"
+        # else:
+        g.cursor.execute("INSERT INTO Users(ticketid, name) VALUES(?, ?)", (ticketid, username,));
+        g.cursor.execute("INSERT INTO Tickets(ticketid, used) VALUES(?, ?)", (ticketid, "false",));
+        g.db.commit() 
+
+        users = g.cursor.execute("SELECT * FROM Tickets").fetchall()
+        print(users)
+        #s=""
+        #s+=" added successfully and token no. is:" 
+        return render_template('users.html', rows = users);
         # print(username + "added successfully");
+
+# @app.route('show_users')
+# def show_user():
+#     r = g.cursor.execute("SELECT * FROM Participate Where Event_id=?", eid).fetchall();
+#     return render_template('users.html', rows = r)
+# @app.route('/show_participants', methods = ["GET"])
+# def show_participants():
+#     """Shows registered users for the next event"""
+    
+
 
 @app.route('/participate', methods=["POST"])
 def register_event():
@@ -63,11 +79,14 @@ def register_event():
         # eid = request.form['eventid']
         # If (uid, eid) already present in Table return error
         
-        exists = g.cursor.execute("SELECT * FROM Users where token = ?", (uid,)).fetchall()
-        if not exists:
-        	return "Invalid ticket"
-
-        print(uid +"+"+ eid)
+        # exists = g.cursor.execute("SELECT * FROM Users where ticketid = ?", (uid,)).fetchall()
+        # if not exists:
+        # 	return "Invalid ticket"
+        isused = g.cursor.execute("SELECT used FROM TICKETS where ticketid = ?", (uid,)).fetchall()
+        
+        if (isused[0][0]=="true"):
+            return "ticket already used"
+        # print(uid +"+"+ eid)
 
 
         # evexist = g.cursor.execute("SELECT EVENT_DATE FROM Events where id = ?", (eid,)).fetchall()
@@ -91,8 +110,11 @@ def register_event():
         #     print(str)
         #     return str;
         # else:
+        # g.cursor.execute("DELETE FROM TICKETS WHERE token =? ", uid)
+        g.cursor.execute("UPDATE TICKETS SET used = ? WHERE ticketid = ?",("true", uid,))
+
         pdata = [uid, eid]
-        g.cursor.execute("INSERT INTO Participate(User_Id, Event_Id) VALUES(?, ?)", pdata)
+        g.cursor.execute("INSERT INTO Participate(userid, eventid) VALUES(?, ?)", pdata)
         g.db.commit()
 
 
@@ -103,7 +125,7 @@ def register_event():
 @app.route('/show_participants', methods = ["GET"])
 def show_participants():
     """Shows registered users for the next event"""
-    r = g.cursor.execute("SELECT * FROM Participate Where Event_id=?", eid).fetchall();
+    r = g.cursor.execute("SELECT * FROM Participate Where eventid=?", eid).fetchall();
     return render_template('participate.html', rows = r)
 
 
@@ -116,8 +138,9 @@ def event_winner():
     # eventids = g.cursor.execute("SELECT id from EVENTS where id = ? ", (eid,)).fetchall();
     # print(eventids)
     # for eid in eventids:
-    
-    usersid = g.cursor.execute("SELECT User_Id from Participate WHERE Event_Id = ? ", (eid,)).fetchall()
+    # /// SELCT USER IDS FOR THE NEXT EVENT
+    usersid = g.cursor.execute("SELECT userid from Participate WHERE eventid = ? ", (eid,)).fetchall()
+
     userid = random.SystemRandom().choice(usersid)
     print("userid")
     # print(userid)
@@ -126,23 +149,23 @@ def event_winner():
         wid = id
     wid = str(wid)
     print(wid)
-    edate = g.db.execute("SELECT Event_Date FROM EVENTS WHERE id = ?", (eid,)).fetchall()
+    edate = g.db.execute("SELECT eventdate FROM EVENTS WHERE eventid = ?", (eid,)).fetchall()
     print(edate)
     for e in edate[0]:
         ed = e
     ed = str(ed)
-    reward = g.db.execute("SELECT REWARDS FROM EVENTS WHERE id = ?", (eid,)).fetchall()
+    reward = g.db.execute("SELECT rewards FROM EVENTS WHERE eventid = ?", (eid,)).fetchall()
     for r in reward[0]:
         re = r
     re = str(re)
-    wname = g.db.execute("SELECT Name FROM Users WHERE token = ?", (wid,)).fetchall()
+    wname = g.db.execute("SELECT name FROM Users WHERE ticketid = ?", (wid,)).fetchall()
     for w in wname[0]:
         wn = w
     wn = str(wn)
     print(type(wn))
     print(wn)
     data = [ed, wn, re]
-    g.cursor.execute("INSERT INTO WINNER(Event_Date, Name, Rewards) VALUES(?, ?, ?)", data)
+    g.cursor.execute("INSERT INTO WINNER(eventdate, name, rewards) VALUES(?, ?, ?)", data)
 
     print(wid)
     s = str(wid) + "is the winner for event" + eid 
@@ -165,16 +188,19 @@ def build_db():
     conn = sqlite3.connect('raffle.db')
     cursor = conn.cursor()
     
-    cursor.execute('CREATE TABLE Events (id INTEGER PRIMARY KEY AUTOINCREMENT, Event_Date TEXT, Rewards TEXT )')
+    cursor.execute('CREATE TABLE Events (eventid INTEGER PRIMARY KEY AUTOINCREMENT, eventdate TEXT, rewards TEXT )')
     print(" Events Table Created")
 
-    cursor.execute('CREATE TABLE Users (token INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT)')
+    cursor.execute('CREATE TABLE Users (ticketid INTEGER PRIMARY KEY, name TEXT)')
     print("User Table Created")
+
+    cursor.execute('CREATE TABLE TICKETS (ticketid INTEGER PRIMARY KEY, used boolean, FOREIGN KEY(ticketid) REFERENCES USERS (ticketid))')
+    print("TICKET Table Created")
     
-    cursor.execute('CREATE TABLE Participate (User_Id INTEGER, Event_Id INTEGER, PRIMARY KEY(User_Id, Event_Id), FOREIGN KEY(User_Id) REFERENCES Users (id), FOREIGN KEY(Event_Id) REFERENCES Events (id))')
+    cursor.execute('CREATE TABLE Participate (userid INTEGER, eventid INTEGER, PRIMARY KEY(userid, eventid))')
     print("Participate table created")
 
-    cursor.execute('CREATE TABLE Winner (Event_Date TEXT, Name TEXT, Rewards TEXT, PRIMARY KEY(Event_Date), FOREIGN KEY(NAME) REFERENCES Users (Name), FOREIGN KEY(Rewards) REFERENCES Events (Rewards) )')
+    cursor.execute('CREATE TABLE Winner (eventdate TEXT, name TEXT, rewards TEXT, PRIMARY KEY(eventdate), FOREIGN KEY(name) REFERENCES Users (name), FOREIGN KEY(rewards) REFERENCES Events (rewards) )')
     # print("Winner table created")
 
 
@@ -187,7 +213,7 @@ def build_db():
             # print ( event + reward)   
             data = [event, reward]
             try:
-                cursor.execute("INSERT INTO Events( Event_Date, Rewards) VALUES(?, ?)", data)
+                cursor.execute("INSERT INTO Events( eventdate, rewards) VALUES(?, ?)", data)
                 conn.commit()
             except Error as err:
                 print(err)
@@ -204,7 +230,7 @@ if __name__ == '__main__':
     '''run build_db once initially for creating tables'''
     global eid
     eid = "1"
-    build_db()
+    # build_db()
     app.run()
 
 
